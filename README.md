@@ -1,5 +1,7 @@
 # 和暦(wareki)
 
+![Test passing](https://github.com/garupanojisan/wareki/actions/workflows/test.yaml/badge.svg)
+
 ## 使い方(Usage)
 
 ```go
