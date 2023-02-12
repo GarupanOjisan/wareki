@@ -1,3 +1,4 @@
+// Package wareki 和暦を扱う機能を提供します
 package wareki
 
 import "time"
@@ -52,22 +53,27 @@ var (
 	}
 )
 
+// IsMeiji は指定した時刻が明治時代かどうかを返します
 func IsMeiji(t time.Time) bool {
 	return meiji.contains(t)
 }
 
+// IsTaisho は指定した時刻が大正時代かどうかを返します
 func IsTaisho(t time.Time) bool {
 	return taisho.contains(t)
 }
 
+// IsShowa は指定した時刻が昭和時代かどうかを返します
 func IsShowa(t time.Time) bool {
 	return showa.contains(t)
 }
 
+// IsHeisei は指定した時刻が平成時代かどうかを返します
 func IsHeisei(t time.Time) bool {
 	return heisei.contains(t)
 }
 
+// IsReiwa は指定した時刻が令和時代かどうかを返します
 func IsReiwa(t time.Time) bool {
 	return reiwa.contains(t)
 }
@@ -77,6 +83,8 @@ type Wareki struct {
 	Year  int
 }
 
+// Get は指定した時刻の和暦を返します
+// 昭和以前は即日改元なので改元日は2つの要素を返します
 func Get(t time.Time) []Wareki {
 	if IsReiwa(t) {
 		return []Wareki{
