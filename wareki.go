@@ -78,48 +78,60 @@ func IsReiwa(t time.Time) bool {
 	return reiwa.contains(t)
 }
 
+// Wareki 和暦を表す
 type Wareki struct {
 	Gengo string
 	Year  int
 }
 
-// Get は指定した時刻の和暦を返します
-// 昭和以前は即日改元なので改元日は2つの要素を返します
-func Get(t time.Time) []Wareki {
-	if IsReiwa(t) {
-		return []Wareki{
-			{Gengo: reiwa.Gengo, Year: reiwa.yearFromStart(t)},
+// New は指定した時刻を和暦に変換します
+func New(t time.Time) Wareki {
+	if reiwa.contains(t) {
+		return Wareki{
+			Gengo: reiwa.Gengo,
+			Year:  reiwa.yearFromStart(t),
 		}
 	}
-
-	if IsHeisei(t) {
-		return []Wareki{
-			{Gengo: heisei.Gengo, Year: heisei.yearFromStart(t)},
+	if heisei.contains(t) {
+		return Wareki{
+			Gengo: heisei.Gengo,
+			Year:  heisei.yearFromStart(t),
 		}
 	}
-
-	// 昭和までは即日改元なので複数の元号が返る
-	result := make([]Wareki, 0, 2)
-	if IsMeiji(t) {
-		result = append(result, Wareki{
-			Gengo: meiji.Gengo,
-			Year:  meiji.yearFromStart(t),
-		})
-	}
-
-	if IsTaisho(t) {
-		result = append(result, Wareki{
-			Gengo: taisho.Gengo,
-			Year:  taisho.yearFromStart(t),
-		})
-	}
-
-	if IsShowa(t) {
-		result = append(result, Wareki{
+	if showa.contains(t) {
+		return Wareki{
 			Gengo: showa.Gengo,
 			Year:  showa.yearFromStart(t),
-		})
+		}
 	}
+	if taisho.contains(t) {
+		return Wareki{
+			Gengo: taisho.Gengo,
+			Year:  taisho.yearFromStart(t),
+		}
+	}
+	if meiji.contains(t) {
+		return Wareki{
+			Gengo: meiji.Gengo,
+			Year:  meiji.yearFromStart(t),
+		}
+	}
+	return Wareki{}
+}
 
-	return result
+// Time は和暦をtime.Timeに変換します
+func (w Wareki) Time() time.Time {
+	switch w.Gengo {
+	case meiji.Gengo:
+		return meiji.Start.AddDate(w.Year-1, 0, 0)
+	case taisho.Gengo:
+		return taisho.Start.AddDate(w.Year-1, 0, 0)
+	case showa.Gengo:
+		return showa.Start.AddDate(w.Year-1, 0, 0)
+	case heisei.Gengo:
+		return heisei.Start.AddDate(w.Year-1, 0, 0)
+	case reiwa.Gengo:
+		return reiwa.Start.AddDate(w.Year-1, 0, 0)
+	}
+	return time.Time{}
 }

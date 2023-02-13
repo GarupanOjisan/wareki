@@ -7,7 +7,7 @@
 ```go
 locationJST := time.FixedZone("Asia/Tokyo", 9*60*60)
 t := time.Date(2023, 1, 1, 0, 0, 0, 0, locationJST)
-w := wareki.Get(t) // [{Gengo: "令和", Year: 5}]
+w := wareki.New(t) // 令和5年1月1日
 ```
 
 ## 取り扱う元号一覧
