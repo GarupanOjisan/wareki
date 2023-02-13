@@ -234,25 +234,23 @@ func TestGetWareki(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []Wareki
+		want Wareki
 	}{
 		{
 			name: "1868年10月22日はサポート対象外",
 			args: args{
 				t: time.Date(1868, 10, 22, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{},
+			want: Wareki{},
 		},
 		{
 			name: "1868年10月23日は明治1年が返る",
 			args: args{
 				t: time.Date(1868, 10, 23, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "明治",
-					Year:  1,
-				},
+			want: Wareki{
+				Gengo: "明治",
+				Year:  1,
 			},
 		},
 		{
@@ -260,15 +258,9 @@ func TestGetWareki(t *testing.T) {
 			args: args{
 				t: time.Date(1912, 7, 30, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "明治",
-					Year:  45,
-				},
-				{
-					Gengo: "大正",
-					Year:  1,
-				},
+			want: Wareki{
+				Gengo: "大正",
+				Year:  1,
 			},
 		},
 		{
@@ -276,15 +268,9 @@ func TestGetWareki(t *testing.T) {
 			args: args{
 				t: time.Date(1926, 12, 25, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "大正",
-					Year:  15,
-				},
-				{
-					Gengo: "昭和",
-					Year:  1,
-				},
+			want: Wareki{
+				Gengo: "昭和",
+				Year:  1,
 			},
 		},
 		{
@@ -292,11 +278,9 @@ func TestGetWareki(t *testing.T) {
 			args: args{
 				t: time.Date(1989, 1, 7, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "昭和",
-					Year:  64,
-				},
+			want: Wareki{
+				Gengo: "昭和",
+				Year:  64,
 			},
 		},
 		{
@@ -304,11 +288,9 @@ func TestGetWareki(t *testing.T) {
 			args: args{
 				t: time.Date(1989, 1, 8, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "平成",
-					Year:  1,
-				},
+			want: Wareki{
+				Gengo: "平成",
+				Year:  1,
 			},
 		},
 		{
@@ -316,11 +298,9 @@ func TestGetWareki(t *testing.T) {
 			args: args{
 				t: time.Date(2019, 4, 30, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "平成",
-					Year:  31,
-				},
+			want: Wareki{
+				Gengo: "平成",
+				Year:  31,
 			},
 		},
 		{
@@ -328,18 +308,81 @@ func TestGetWareki(t *testing.T) {
 			args: args{
 				t: time.Date(2019, 5, 1, 0, 0, 0, 0, locationJST),
 			},
-			want: []Wareki{
-				{
-					Gengo: "令和",
-					Year:  1,
-				},
+			want: Wareki{
+				Gengo: "令和",
+				Year:  1,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Get(tt.args.t); !reflect.DeepEqual(got, tt.want) {
+			if got := New(tt.args.t); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Get() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// TestWareki_Time は、Wareki型のTimeメソッドのテストです。
+func TestWareki_Time(t *testing.T) {
+	type fields struct {
+		Gengo string
+		Year  int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   time.Time
+	}{
+		{
+			name: "明治1年は1868年10月23日",
+			fields: fields{
+				Gengo: "明治",
+				Year:  1,
+			},
+			want: time.Date(1868, 10, 23, 0, 0, 0, 0, locationJST),
+		},
+		{
+			name: "大正1年は1912年7月30日",
+			fields: fields{
+				Gengo: "大正",
+				Year:  1,
+			},
+			want: time.Date(1912, 7, 30, 0, 0, 0, 0, locationJST),
+		},
+		{
+			name: "昭和1年は1926年12月25日",
+			fields: fields{
+				Gengo: "昭和",
+				Year:  1,
+			},
+			want: time.Date(1926, 12, 25, 0, 0, 0, 0, locationJST),
+		},
+		{
+			name: "平成1年は1989年1月8日",
+			fields: fields{
+				Gengo: "平成",
+				Year:  1,
+			},
+			want: time.Date(1989, 1, 8, 0, 0, 0, 0, locationJST),
+		},
+		{
+			name: "令和1年は2019年5月1日",
+			fields: fields{
+				Gengo: "令和",
+				Year:  1,
+			},
+			want: time.Date(2019, 5, 1, 0, 0, 0, 0, locationJST),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := Wareki{
+				Gengo: tt.fields.Gengo,
+				Year:  tt.fields.Year,
+			}
+			if got := w.Time(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Time() = %v, want %v", got, tt.want)
 			}
 		})
 	}
